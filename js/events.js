@@ -20,18 +20,21 @@
     return m;
   }
 
+  /** 수업 제목은 "OOO 회원 (오후 3시)"까지만 (예전에 저장된 끝의 "수업"은 빼고 보여줘요) */
+  function displayTitle(ev) {
+    return ev.category === "lesson" ? ev.title.replace(/\)\s*수업$/, ")") : ev.title;
+  }
+
   function eventCard(ev) {
     var c = catOf(ev);
     var isLesson = ev.category === "lesson";
-    var m = isLesson ? lessonMember(ev) : null;
     var html = '<li class="ev-card cat-line-' + c.key + (ev.done ? " is-done" : "") + '" data-id="' + ev.id + '" role="button" tabindex="0">' +
       '<span class="cat-badge lg cat-' + c.key + (ev.done ? " done" : "") + '"><img src="' + c.img + '" alt=""></span>' +
       '<div class="ev-main">' +
         '<div class="ev-top"><span class="cat-tag cat-' + c.key + '">' + c.label + "</span>" +
           (ev.seriesId ? '<span class="rep-tag" title="반복 일정">' + UI.ICON.repeat + "</span>" : "") +
           '<span class="ev-time">' + U.esc(U.fmtEventTime(ev)) + "</span></div>" +
-        '<p class="ev-title">' + U.esc(ev.title) + "</p>" +
-        (isLesson ? '<p class="ev-member">' + (m ? "🐾 " + U.esc(U.memberLabel(m)) : "회원 정보 없음") + "</p>" : "") +
+        '<p class="ev-title">' + U.esc(displayTitle(ev)) + "</p>" +
         (ev.memo ? '<p class="ev-memo">' + U.esc(ev.memo) + "</p>" : "") +
       "</div>" +
       (isLesson
@@ -125,7 +128,7 @@
   }
 
   function lessonTitle(m, start) {
-    return m.name + " 회원 (" + U.fmtTimeKo(start) + ") 수업";
+    return m.name + " 회원 (" + U.fmtTimeKo(start) + ")";
   }
 
   /**
@@ -238,7 +241,10 @@
       // 수정할 때: 자동으로 들어갔던 제목이면 계속 자동으로 따라가게
       if (editing && src.category === "lesson" && src.memberId) {
         var m0 = App.state.memberMap[src.memberId];
-        if (m0 && titleIn.value === lessonTitle(m0, start)) st.autoTitle = titleIn.value;
+        if (m0 && (titleIn.value === lessonTitle(m0, start) || titleIn.value === lessonTitle(m0, start) + " 수업")) {
+          titleIn.value = lessonTitle(m0, start);
+          st.autoTitle = titleIn.value;
+        }
       }
       if (editing && (src.category === "duty" || src.category === "off") && titleIn.value === U.CAT_MAP[src.category].label) {
         st.autoTitle = titleIn.value;
@@ -598,7 +604,7 @@
     }
   }
 
-  /* ---------- 시간 선택 (10분 단위) ---------- */
+  /* ---------- 시간 선택 (5분 단위) ---------- */
   function hourLabel(h) {
     return (h < 12 ? "오전 " : "오후 ") + (h % 12 === 0 ? 12 : h % 12) + "시";
   }
@@ -606,7 +612,7 @@
     var hours = "";
     for (var h = 0; h < 24; h++) hours += '<option value="' + h + '">' + hourLabel(h) + "</option>";
     var mins = "";
-    for (var m = 0; m < 60; m += 10) mins += '<option value="' + m + '">' + U.pad(m) + "분</option>";
+    for (var m = 0; m < 60; m += 5) mins += '<option value="' + m + '">' + U.pad(m) + "분</option>";
     return '<div class="time-pick" id="' + id + '-wrap">' +
       '<select class="input tp-h" aria-label="' + label + ' 시">' + hours + "</select>" +
       '<select class="input tp-m" aria-label="' + label + ' 분">' + mins + "</select>" +
@@ -618,7 +624,7 @@
     var wrap = hidden.parentNode;
     var p = (v || "00:00").split(":").map(Number);
     var mSel = wrap.querySelector(".tp-m");
-    // 예전에 저장된 10분 단위가 아닌 시간도 그대로 보여줘요
+    // 예전에 저장된 5분 단위가 아닌 시간도 그대로 보여줘요
     if (!mSel.querySelector('option[value="' + p[1] + '"]')) {
       var o = document.createElement("option");
       o.value = p[1];

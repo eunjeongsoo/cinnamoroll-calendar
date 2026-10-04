@@ -43,27 +43,17 @@
   }
 
   var BAR_H = 17;     // 한 줄 바 + 간격
-  var LESSON_H = 29;  // 두 줄(회원명/시간) 수업 바 + 간격
   var MORE_H = 14;    // "+n" 줄
 
-  function lessonName(ev) {
-    var m = ev.memberId ? App.state.memberMap[ev.memberId] : null;
-    return m ? m.name : "수업";
-  }
-  function lessonTime(ev) {
-    return ev.allDay ? "종일" : (ev.start || "").slice(11, 16);
-  }
-  /** 바 안 글자: 수업은 회원명 + 시간, 나머지는 일정 제목 */
+  /** 바 안 글자 (한 줄): 수업은 "회원명 수업", 나머지는 일정 제목 */
   function barText(ev) {
-    return ev.category === "lesson" ? lessonName(ev) + " " + lessonTime(ev) : ev.title;
+    if (ev.category !== "lesson") return ev.title;
+    var m = ev.memberId ? App.state.memberMap[ev.memberId] : null;
+    return m ? m.name + " 수업" : "수업";
   }
   function barHtml(ev) {
     var cat = U.CAT_MAP[ev.category] ? ev.category : "normal";
-    var cls = "bar bar-" + cat + (ev.done ? " done" : "");
-    if (cat === "lesson") {
-      return '<span class="' + cls + ' two"><b>' + U.esc(lessonName(ev)) + "</b><i>" + lessonTime(ev) + "</i></span>";
-    }
-    return '<span class="' + cls + '">' + U.esc(ev.title) + "</span>";
+    return '<span class="bar bar-' + cat + (ev.done ? " done" : "") + '">' + U.esc(barText(ev)) + "</span>";
   }
 
   /** 칸 안에 바를 그릴 수 있는 높이(px) */
@@ -75,19 +65,9 @@
 
   /** 높이에 맞게 보여줄 일정 고르기 (넘치면 "+n" 자리 남김) */
   function fit(list, room) {
-    var used = 0, n = 0;
-    for (; n < list.length; n++) {
-      var hh = list[n].category === "lesson" ? LESSON_H : BAR_H;
-      if (used + hh > room) break;
-      used += hh;
-    }
-    if (n < list.length) {
-      while (n > 1 && used + MORE_H > room) {
-        n--;
-        used -= list[n].category === "lesson" ? LESSON_H : BAR_H;
-      }
-    }
-    return Math.max(n, 1);
+    var n = Math.floor(room / BAR_H);
+    if (n < list.length) n = Math.floor((room - MORE_H) / BAR_H);
+    return Math.max(Math.min(n, list.length), 1);
   }
 
   function paintCell(cell, idx, today, cap) {
