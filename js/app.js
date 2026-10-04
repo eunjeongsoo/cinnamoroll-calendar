@@ -60,15 +60,13 @@
           '<ul class="menu-list">' +
             '<li><button type="button" data-act="today">' + UI.ICON.today + "<span>오늘로 이동</span></button></li>" +
             '<li><button type="button" data-act="add">' + UI.ICON.plus + "<span>오늘 일정 추가</span></button></li>" +
-            '<li><button type="button" data-act="picker">' + UI.ICON.calendar + "<span>년·월 골라서 이동</span></button></li>" +
             '<li><button type="button" data-act="members">' + UI.ICON.people + "<span>회원 관리</span></button></li>" +
-            '<li><button type="button" data-act="home"><img src="' + U.IMG + 'lying.png" alt=""><span>집가고 싶다…</span></button></li>' +
             '<li><button type="button" data-act="settings">' + UI.ICON.gear + "<span>설정 · 백업</span></button></li>" +
           "</ul>" +
-          '<div class="legend"><p class="mini-lbl">아이콘 안내 (우선순위 순)</p><div class="legend-row">' +
-            ["important", "lesson", "duty", "off", "normal"].map(function (k) {
+          '<div class="legend"><p class="mini-lbl">일정 바 색깔 안내</p><div class="legend-row">' +
+            ["lesson", "important", "duty", "off", "normal"].map(function (k) {
               var c = U.CAT_MAP[k];
-              return '<span class="legend-item"><span class="cat-badge cat-' + k + '"><img src="' + c.img + '" alt=""></span>' + c.label + "</span>";
+              return '<span class="legend-item"><span class="bar bar-' + k + ' legend-bar">' + (k === "lesson" ? "수업" : "제목") + "</span>" + c.label + "</span>";
             }).join("") +
           "</div></div>";
         body.addEventListener("click", function (e) {
@@ -79,10 +77,6 @@
             UI.closeTop().then(function () { Events.openForm({ date: U.todayKey() }); });
             return;
           }
-          if (act === "picker") {
-            UI.closeTop().then(function () { Calendar.openPicker(); });
-            return;
-          }
           if (act === "settings") {
             UI.closeTop().then(function () { Settings.open(); });
             return;
@@ -90,7 +84,6 @@
           UI.closeAll().then(function () {
             if (act === "today") Calendar.goToday(true);
             else if (act === "members") switchTab("members");
-            else if (act === "home") Fun.goHome();
           });
         });
       }

@@ -10,20 +10,31 @@
   --danger: #F08A9B;
 
   /* 파생 색 */
-  --sky-soft: #E6F4FC;
+  --bg: #FFFFFF;
+  --bg-tint: #F7FBFF;
+  --sky-soft: #EAF6FD;
   --sky-ink: #3F86C4;
-  --pink-soft: #FFEAF1;
+  --pink-soft: #FFEEF4;
   --text-soft: #8797A8;
-  --line: #E3EEF6;
+  --line: #CDE6F7;          /* 몽글몽글 블루 선 */
+  --line-strong: #A6D3F1;
   --shadow-color: 125, 185, 232;
-  --dim: rgba(74, 91, 110, 0.38);
+  --dim: rgba(74, 91, 110, 0.32);
 
-  /* 분류 색 */
-  --cat-normal: #E6F4FC;
-  --cat-important: #FFD1E0;
-  --cat-lesson: #D6ECFB;
-  --cat-duty: #FFF1C9;
-  --cat-off: #E9E4FB;
+  /* 분류 색 (배지/칩 배경) */
+  --cat-normal: #E3F3FC;
+  --cat-important: #FFDDE8;
+  --cat-lesson: #D3EBFB;
+  --cat-duty: #E3E6FB;
+  --cat-off: #F6E3F1;
+
+  /* 달력 일정 바 — 파랑/분홍 파스텔 */
+  --bar-lesson: #A9D7F5;     /* 수업: 하늘 파랑 */
+  --bar-important: #FFB7CC;  /* 중요: 딸기우유 분홍 */
+  --bar-duty: #C3CBF5;       /* 당직: 라벤더 블루 */
+  --bar-off: #F3C9E6;        /* 휴무: 솜사탕 핑크 */
+  --bar-normal: #CBEAF4;     /* 일반: 민트 하늘 */
+  --bar-text: #3E4F63;
 
   /* 모양 */
   --radius-sm: 16px;

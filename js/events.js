@@ -373,7 +373,7 @@
           var rest = U.remainingCount(sel, App.state.events);
           box.innerHTML =
             '<div class="member-picked">' +
-              '<div class="mp-head"><img src="' + U.IMG + 'face.png" alt=""><div><strong>' + U.esc(U.memberLabel(sel)) + "</strong>" +
+              '<div class="mp-head">' + Members.avatar(sel) + '<div><strong>' + U.esc(U.memberLabel(sel)) + "</strong>" +
                 '<span class="muted">' + U.esc([sel.gender, goalText(sel)].filter(Boolean).join(" · ")) + "</span></div>" +
                 '<button type="button" class="btn soft sm" data-act="changeMember">바꾸기</button></div>' +
               '<div class="mp-rest ' + (rest <= 0 ? "zero" : rest <= 3 ? "low" : "") + '">남은 횟수 <b>' + rest + "회</b></div>" +

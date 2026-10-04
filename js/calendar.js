@@ -43,9 +43,22 @@
     return el;
   }
 
-  function paintCell(cell, idx, today) {
+  /** 바 안 글자: 수업은 "수업", 나머지는 일정 제목 */
+  function barText(ev) {
+    return ev.category === "lesson" ? "수업" : ev.title;
+  }
+
+  /** 칸 높이에 들어가는 바 개수 */
+  function capacity(mo) {
+    var c = mo.el.querySelector(".cell[data-date]");
+    var h = c ? c.clientHeight : 0;
+    if (!h) return 3;
+    return Math.max(1, Math.floor((h - 28) / 17));
+  }
+
+  function paintCell(cell, idx, today, cap) {
     var key = cell.getAttribute("data-date");
-    var list = idx[key] || [];
+    var list = idx[key] || []; // 하루 종일 → 시간순으로 정렬돼 있어요
     cell.classList.toggle("today", key === today);
     cell.classList.toggle("has", list.length > 0);
     var mark = cell.querySelector(".mark");
@@ -55,23 +68,21 @@
       cell.setAttribute("aria-label", label + ", 일정 없음");
       return;
     }
-    var cat = U.topCategory(list);
-    var dots = "";
-    if (list.length > 1) {
-      var n = Math.min(list.length, 4);
-      for (var i = 0; i < n; i++) dots += "<i></i>";
-      if (list.length > 4) dots += "<b>+</b>";
-    }
-    var allDone = cat.key === "lesson" && list.filter(function (e) { return e.category === "lesson"; }).every(function (e) { return e.done; });
-    mark.innerHTML = '<span class="cat-badge cat-' + cat.key + (allDone ? " done" : "") + '"><img src="' + cat.img + '" alt="' + cat.label + '"></span>' +
-      (dots ? '<span class="dots">' + dots + "</span>" : "");
-    cell.setAttribute("aria-label", label + ", 일정 " + list.length + "개");
+    var shown = list.length > cap ? list.slice(0, Math.max(cap - 1, 1)) : list;
+    var html = shown.map(function (ev) {
+      var cat = U.CAT_MAP[ev.category] ? ev.category : "normal";
+      return '<span class="bar bar-' + cat + (ev.done ? " done" : "") + '">' + U.esc(barText(ev)) + "</span>";
+    }).join("");
+    if (shown.length < list.length) html += '<span class="bar-more">+' + (list.length - shown.length) + "</span>";
+    mark.innerHTML = html;
+    cell.setAttribute("aria-label", label + ", 일정 " + list.length + "개: " + list.map(barText).join(", "));
   }
 
   function paintMonth(mo) {
     var idx = App.state.dayIndex;
     var today = U.todayKey();
-    mo.el.querySelectorAll(".cell[data-date]").forEach(function (c) { paintCell(c, idx, today); });
+    var cap = capacity(mo);
+    mo.el.querySelectorAll(".cell[data-date]").forEach(function (c) { paintCell(c, idx, today, cap); });
   }
 
   function refresh() {
@@ -252,6 +263,7 @@
         lastH = monthH;
         var i = indexOf(before.y, before.m);
         if (i >= 0) scroller.scrollTop = i * monthH;
+        refresh();
       }
     };
     window.addEventListener("resize", keepMonth);
@@ -285,6 +297,7 @@
       setTimeout(function () { adjusting = false; }, 80);
     }
     savedIdx = null;
+    refresh(); // 숨겨져 있던 동안 바뀐 일정/칸 높이 반영
   }
 
   window.Calendar = {

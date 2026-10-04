@@ -7,6 +7,30 @@
 
   function restClass(rest) { return rest <= 0 ? "zero" : rest <= 3 ? "low" : ""; }
 
+  /* ---------- 시나모롤 프로필 (여: 리본 / 남: 나비넥타이) ---------- */
+  var RIBBON =
+    '<svg class="acc ribbon" viewBox="0 0 40 32" aria-hidden="true">' +
+      '<path d="M18 17l-5 12 4-1.5 2 3.5 2-12z" fill="#FFB7CC" stroke="#8E6A4C" stroke-width="1.6" stroke-linejoin="round"/>' +
+      '<path d="M22 17l5 12-4-1.5-2 3.5-2-12z" fill="#FFB7CC" stroke="#8E6A4C" stroke-width="1.6" stroke-linejoin="round"/>' +
+      '<path d="M20 14C14 2 2 3 3 12s12 8 17 4z" fill="#FFC9D9" stroke="#8E6A4C" stroke-width="1.6" stroke-linejoin="round"/>' +
+      '<path d="M20 14C26 2 38 3 37 12s-12 8-17 4z" fill="#FFC9D9" stroke="#8E6A4C" stroke-width="1.6" stroke-linejoin="round"/>' +
+      '<path d="M8 10c2-2 5-2 7 0M25 10c2-2 5-2 7 0" fill="none" stroke="#FF9FBA" stroke-width="1.4" stroke-linecap="round"/>' +
+      '<ellipse cx="20" cy="15" rx="4.2" ry="4.6" fill="#FF9FBA" stroke="#8E6A4C" stroke-width="1.6"/>' +
+    "</svg>";
+  var BOWTIE =
+    '<svg class="acc bowtie" viewBox="0 0 40 22" aria-hidden="true">' +
+      '<path d="M18 11L5 3.5Q1.5 11 5 18.5z" fill="#9CCDF2" stroke="#6B5440" stroke-width="1.6" stroke-linejoin="round"/>' +
+      '<path d="M22 11L35 3.5Q38.5 11 35 18.5z" fill="#9CCDF2" stroke="#6B5440" stroke-width="1.6" stroke-linejoin="round"/>' +
+      '<rect x="16.5" y="6.5" width="7" height="9" rx="3" fill="#7DB9E8" stroke="#6B5440" stroke-width="1.6"/>' +
+      '<circle cx="8.5" cy="9" r="1.2" fill="#fff"/><circle cx="31.5" cy="13" r="1.2" fill="#fff"/>' +
+    "</svg>";
+
+  function avatar(m, size) {
+    var g = m && m.gender === "여" ? "girl" : m && m.gender === "남" ? "boy" : "";
+    return '<span class="cin-avatar ' + g + " " + (size || "") + '" aria-hidden="true">' +
+      '<img src="' + U.IMG + 'face.png" alt="">' + (g === "girl" ? RIBBON : g === "boy" ? BOWTIE : "") + "</span>";
+  }
+
   /* ---------- 목록 ---------- */
   function renderList() {
     if (!listEl) return;
@@ -31,9 +55,8 @@
     }
     listEl.innerHTML = shown.map(function (m) {
       var rest = U.remainingCount(m, events);
-      var g = m.gender === "여" ? "girl" : m.gender === "남" ? "boy" : "";
       return '<li><button type="button" class="member-card ' + (rest <= 3 ? "alert" : "") + '" data-mid="' + m.id + '">' +
-        '<span class="avatar ' + g + '">' + U.esc(m.name.slice(0, 1)) + "</span>" +
+        avatar(m) +
         '<span class="mc-main"><strong>' + U.esc(U.memberLabel(m)) + "</strong>" +
           '<span class="muted">' + U.esc([m.gender || "성별 미입력", Events.goalText(m)].filter(Boolean).join(" · ")) + "</span></span>" +
         '<span class="rest-pill ' + restClass(rest) + '">' + (rest <= 3 ? "⚠️ " : "") + "남은 <b>" + rest + "</b>회</span>" +
@@ -216,10 +239,10 @@
 
       sheet.body.innerHTML =
         '<div class="profile">' +
-          '<img src="' + U.IMG + 'face.png" alt="">' +
+          avatar(m, "lg") +
           '<div><h3>' + U.esc(U.memberLabel(m)) + "</h3>" +
           '<p class="muted">' + U.esc([m.gender, Events.goalText(m) ? "목적: " + Events.goalText(m) : ""].filter(Boolean).join(" · ") || "추가 정보 없음") + "</p>" +
-          '<p class="muted tiny">' + m.birthYear + "년생 · 매년 1월 1일에 한 살씩 올라가요</p></div>" +
+          '<p class="muted tiny">' + m.birthYear + "년생</p></div>" +
         "</div>" +
         '<div class="stats">' +
           '<div><span>총 등록</span><b>' + total + "</b></div>" +
@@ -383,6 +406,7 @@
     init: init,
     renderList: renderList,
     openForm: openForm,
-    openDetail: openDetail
+    openDetail: openDetail,
+    avatar: avatar
   };
 })();

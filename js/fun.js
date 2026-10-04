@@ -39,12 +39,32 @@
     "퇴근까지 카운트다운 시작! 3, 2, 1… 아직이네 헤헤"
   ];
 
+  // 직장인 공감 욕 (퍼큐 시나모롤 전용)
+  var CURSES = [
+    "쌰갈 너가 뭔데 우리 주현이한테 뭐라고 해",
+    "인생 ㅈ같지? 내가 다 뿌셔줄게",
+    "퇴근 시간 지나서 연락하는 놈 누구야? 당장 나와",
+    "월급은 쥐꼬리 일은 코끼리… 이게 맞냐고 ㅅㅂ",
+    "우리 주현이 괴롭히는 사람, 내 귀로 싸대기 날린다",
+    "노쇼한 회원님? 니 근손실 와라 퉤퉤",
+    "식단 또 안 지켰다고? 아오 진짜 ㅅㅂ 내가 다 화나",
+    "오늘 진상 몇 명이었어? 내가 다 접어줄게",
+    "ㅈ같은 하루였어도 주현이는 하나도 잘못 없어",
+    "때려치고 싶지? 그 마음 백 번 인정. 근데 월급날까진 버텨",
+    "개빡치면 소리 질러! 으아아아악!!",
+    "남 탓 아니고 그 사람 탓이야. 내가 보증해",
+    "스트레스 너 이리 와, 데드리프트로 들어서 던져버린다",
+    "누가 주현이 기분 망쳤어? 시나모롤 귀 펀치 장전 완료"
+  ];
+
   var CHEER_IMGS = ["wave.png", "hat.png", "ears.png"];
-  var HOME_IMGS = ["fy.png", "lying.png", "toast.png", "fy.png"];
+  var HOME_IMGS = ["lying.png", "toast.png", "ears.png", "peek.png"];
 
   var lastCheer = null;
   var lastComfort = null;
+  var lastCurse = null;
   var lastHomeImg = null;
+  var homeMode = "comfort"; // comfort | curse
   var cheerEl = null;
   var cheerTimer = null;
 
@@ -95,6 +115,7 @@
 
   function goHome() {
     if (homeEl) { nextComfort(); return; }
+    homeMode = "comfort";
     var img = U.pickNoRepeat(HOME_IMGS, lastHomeImg);
     lastHomeImg = img;
     var el = UI.h(
@@ -112,12 +133,17 @@
         '<span class="mini-cloud c1">' + UI.ICON.cloud + "</span>" +
         '<span class="mini-cloud c2">' + UI.ICON.cloud + "</span>" +
         '<span class="mini-cloud c3">' + UI.ICON.cloud + "</span>" +
-        '<p class="home-hint">시나모롤을 누르면 다른 말을 해줘요</p>' +
+        '<div class="home-bottom">' +
+          '<p class="home-hint">시나모롤을 누르면 다른 말을 해줘요</p>' +
+          '<button type="button" class="curse-btn">🤬 <span>욕이 필요해</span></button>' +
+        "</div>" +
       "</div>"
     );
     homeEl = el;
+    homeEl._img = img;
     nextComfort();
     el.querySelector(".home-close").addEventListener("click", closeHome);
+    el.querySelector(".curse-btn").addEventListener("click", toggleCurse);
     el.querySelector(".home-float").addEventListener("click", function () {
       nextComfort();
       var f = el.querySelector(".home-img");
@@ -131,10 +157,33 @@
     });
   }
 
+  /** 위로 ↔ 욕 모드 전환 (욕 모드에서만 퍼큐 시나모롤 등장) */
+  function toggleCurse() {
+    if (!homeEl) return;
+    homeMode = homeMode === "curse" ? "comfort" : "curse";
+    var curse = homeMode === "curse";
+    homeEl.classList.toggle("curse", curse);
+    var img = homeEl.querySelector(".home-img");
+    img.src = U.IMG + (curse ? "fy.png" : homeEl._img);
+    img.alt = curse ? "화난 시나모롤" : "둥실둥실 시나모롤";
+    img.classList.remove("boing");
+    void img.offsetWidth;
+    img.classList.add("boing");
+    homeEl.querySelector(".curse-btn").innerHTML = curse ? "☁️ <span>다시 위로해줘</span>" : "🤬 <span>욕이 필요해</span>";
+    homeEl.querySelector(".home-hint").textContent = curse ? "시나모롤을 누르면 더 시원하게 욕해줘요" : "시나모롤을 누르면 다른 말을 해줘요";
+    nextComfort();
+  }
+
   function nextComfort() {
     if (!homeEl) return;
-    var msg = U.pickNoRepeat(COMFORTS, lastComfort);
-    lastComfort = msg;
+    var msg;
+    if (homeMode === "curse") {
+      msg = U.pickNoRepeat(CURSES, lastCurse);
+      lastCurse = msg;
+    } else {
+      msg = U.pickNoRepeat(COMFORTS, lastComfort);
+      lastComfort = msg;
+    }
     var p = homeEl.querySelector(".bubble p");
     var bubble = homeEl.querySelector(".bubble");
     p.textContent = msg;
@@ -162,6 +211,7 @@
     goHome: goHome,
     closeHome: closeHome,
     CHEERS: CHEERS,
-    COMFORTS: COMFORTS
+    COMFORTS: COMFORTS,
+    CURSES: CURSES
   };
 })();
