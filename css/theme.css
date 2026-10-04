@@ -1,0 +1,55 @@
+/* 시나모롤 테마 변수 — 색/모양/글꼴은 여기서만 바꾸면 돼요 */
+:root {
+  /* 기본 팔레트 */
+  --sky: #BFE3F7;
+  --sky-deep: #7DB9E8;
+  --cloud: #FFFFFF;
+  --cream: #FFF9F0;
+  --pink: #FFD1E0;
+  --text: #4A5B6E;
+  --danger: #F08A9B;
+
+  /* 파생 색 */
+  --sky-soft: #E6F4FC;
+  --sky-ink: #3F86C4;
+  --pink-soft: #FFEAF1;
+  --text-soft: #8797A8;
+  --line: #E3EEF6;
+  --shadow-color: 125, 185, 232;
+  --dim: rgba(74, 91, 110, 0.38);
+
+  /* 분류 색 */
+  --cat-normal: #E6F4FC;
+  --cat-important: #FFD1E0;
+  --cat-lesson: #D6ECFB;
+  --cat-duty: #FFF1C9;
+  --cat-off: #E9E4FB;
+
+  /* 모양 */
+  --radius-sm: 16px;
+  --radius: 20px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+  --shadow: 0 6px 18px rgba(var(--shadow-color), 0.22);
+  --shadow-soft: 0 3px 10px rgba(var(--shadow-color), 0.16);
+  --shadow-up: 0 -8px 28px rgba(var(--shadow-color), 0.25);
+
+  /* 크기 */
+  --tap: 44px;
+  --header-h: 56px;
+  --tabbar-h: 62px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* 글꼴: 둥근 고딕 계열 시스템 폰트 우선 */
+  --font: "NanumSquareRound", "Nanum Square Round", "나눔스퀘어라운드", ui-rounded, "SF Pro Rounded",
+    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "맑은 고딕", system-ui, -apple-system, sans-serif;
+
+  /* 움직임 */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: light;
+}
