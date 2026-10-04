@@ -42,17 +42,52 @@
     return el;
   }
 
-  /** 바 안 글자: 수업은 "수업", 나머지는 일정 제목 */
+  var BAR_H = 17;     // 한 줄 바 + 간격
+  var LESSON_H = 29;  // 두 줄(회원명/시간) 수업 바 + 간격
+  var MORE_H = 14;    // "+n" 줄
+
+  function lessonName(ev) {
+    var m = ev.memberId ? App.state.memberMap[ev.memberId] : null;
+    return m ? m.name : "수업";
+  }
+  function lessonTime(ev) {
+    return ev.allDay ? "종일" : (ev.start || "").slice(11, 16);
+  }
+  /** 바 안 글자: 수업은 회원명 + 시간, 나머지는 일정 제목 */
   function barText(ev) {
-    return ev.category === "lesson" ? "수업" : ev.title;
+    return ev.category === "lesson" ? lessonName(ev) + " " + lessonTime(ev) : ev.title;
+  }
+  function barHtml(ev) {
+    var cat = U.CAT_MAP[ev.category] ? ev.category : "normal";
+    var cls = "bar bar-" + cat + (ev.done ? " done" : "");
+    if (cat === "lesson") {
+      return '<span class="' + cls + ' two"><b>' + U.esc(lessonName(ev)) + "</b><i>" + lessonTime(ev) + "</i></span>";
+    }
+    return '<span class="' + cls + '">' + U.esc(ev.title) + "</span>";
   }
 
-  /** 칸 높이에 들어가는 바 개수 */
+  /** 칸 안에 바를 그릴 수 있는 높이(px) */
   function capacity(mo) {
     var c = mo.el.querySelector(".cell[data-date]");
     var h = c ? c.clientHeight : 0;
-    if (!h) return 3;
-    return Math.max(1, Math.floor((h - 28) / 17));
+    return h ? h - 28 : 3 * BAR_H;
+  }
+
+  /** 높이에 맞게 보여줄 일정 고르기 (넘치면 "+n" 자리 남김) */
+  function fit(list, room) {
+    var used = 0, n = 0;
+    for (; n < list.length; n++) {
+      var hh = list[n].category === "lesson" ? LESSON_H : BAR_H;
+      if (used + hh > room) break;
+      used += hh;
+    }
+    if (n < list.length) {
+      while (n > 1 && used + MORE_H > room) {
+        n--;
+        used -= list[n].category === "lesson" ? LESSON_H : BAR_H;
+      }
+    }
+    return Math.max(n, 1);
   }
 
   function paintCell(cell, idx, today, cap) {
@@ -67,11 +102,8 @@
       cell.setAttribute("aria-label", label + ", 일정 없음");
       return;
     }
-    var shown = list.length > cap ? list.slice(0, Math.max(cap - 1, 1)) : list;
-    var html = shown.map(function (ev) {
-      var cat = U.CAT_MAP[ev.category] ? ev.category : "normal";
-      return '<span class="bar bar-' + cat + (ev.done ? " done" : "") + '">' + U.esc(barText(ev)) + "</span>";
-    }).join("");
+    var shown = list.slice(0, fit(list, cap));
+    var html = shown.map(barHtml).join("");
     if (shown.length < list.length) html += '<span class="bar-more">+' + (list.length - shown.length) + "</span>";
     mark.innerHTML = html;
     cell.setAttribute("aria-label", label + ", 일정 " + list.length + "개: " + list.map(barText).join(", "));

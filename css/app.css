@@ -146,7 +146,7 @@ small { font-size: 0.8em; }
   scroll-snap-stop: always;
   display: flex;
   flex-direction: column;
-  padding: 2px 6px 70px;
+  padding: 2px 6px 76px;
 }
 .month-grid {
   flex: 1;
@@ -219,6 +219,11 @@ small { font-size: 0.8em; }
   text-align: left;
 }
 .bar-lesson { background: var(--bar-lesson); }
+/* 수업 바: 위 회원명 / 아래 시간 */
+.bar.two { height: 27px; display: flex; flex-direction: column; justify-content: center; line-height: 12px; padding: 1px 3px; }
+.bar.two b, .bar.two i { display: block; overflow: hidden; white-space: nowrap; font-style: normal; }
+.bar.two b { font-size: 10px; font-weight: 800; }
+.bar.two i { font-size: 9.5px; font-weight: 700; opacity: 0.8; }
 .bar-important { background: var(--bar-important); }
 .bar-duty { background: var(--bar-duty); }
 .bar-off { background: var(--bar-off); }
@@ -278,26 +283,27 @@ small { font-size: 0.8em; }
 /* ---------- 선물(집가고 싶다) 버튼 ---------- */
 .home-fab {
   position: fixed;
-  right: calc(14px + var(--safe-right));
-  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 10px);
+  right: calc(8px + var(--safe-right));
+  bottom: calc(var(--tabbar-h) + var(--safe-bottom));
   z-index: 20;
-  width: 56px;
-  height: 56px;
-  display: grid;
-  place-items: center;
+  width: 76px;
+  height: 76px;
   padding: 0;
-  border: 2px solid var(--line-strong);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fff, var(--pink-soft));
-  color: #E57F9C;
-  box-shadow: var(--shadow);
-  animation: fab-bob 3.2s ease-in-out infinite;
+  border: none;
+  background: transparent;
+  animation: fab-float 3.4s ease-in-out infinite;
 }
-.home-fab svg { width: 32px; height: 32px; }
-.home-fab:active { transform: scale(0.92); }
-@keyframes fab-bob {
-  0%, 100% { translate: 0 0; rotate: -4deg; }
-  50% { translate: 0 -5px; rotate: 4deg; }
+.home-fab img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 6px rgba(var(--shadow-color), 0.35));
+}
+.home-fab:active img { transform: scale(0.9); }
+/* 둥둥 떠다니기 */
+@keyframes fab-float {
+  0%, 100% { translate: 0 0; rotate: -5deg; }
+  50% { translate: 0 -8px; rotate: 4deg; }
 }
 
 /* ---------- 하단 탭 ---------- */
@@ -660,7 +666,19 @@ input[type="number"] { -moz-appearance: textfield; }
   20%, 60% { transform: translateX(-5px); }
   40%, 80% { transform: translateX(5px); }
 }
-.dt-row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 8px; }
+.dt-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: 6px; }
+/* 10분 단위 시간 선택 */
+.time-pick { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 4px; min-width: 0; }
+.time-pick select.input {
+  padding: 0 19px 0 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%237DB9E8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 7px center;
+  background-size: 10px 7px;
+  cursor: pointer;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .all-day .dt-row { grid-template-columns: minmax(0, 1fr); }
 .row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
 .unit-input { position: relative; }

@@ -66,7 +66,7 @@
           '<div class="legend"><p class="mini-lbl">일정 바 색깔 안내</p><div class="legend-row">' +
             ["lesson", "important", "duty", "off", "normal"].map(function (k) {
               var c = U.CAT_MAP[k];
-              return '<span class="legend-item"><span class="bar bar-' + k + ' legend-bar">' + (k === "lesson" ? "수업" : "제목") + "</span>" + c.label + "</span>";
+              return '<span class="legend-item"><span class="bar bar-' + k + ' legend-bar">' + (k === "lesson" ? "회원명" : "제목") + "</span>" + c.label + "</span>";
             }).join("") +
           "</div></div>";
         body.addEventListener("click", function (e) {

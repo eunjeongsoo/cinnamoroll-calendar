@@ -4,9 +4,9 @@
 
   var IMG = "icons/app/";
 
-  // 우선순위: 숫자가 클수록 높음 (중요 > 수업 > 당직 > 휴무 > 일반)
+  // 우선순위: 숫자가 클수록 높음 (중요 > 수업 > 당직 > 휴무 > 약속)
   var CATEGORIES = [
-    { key: "normal", label: "일반", img: IMG + "face.png", color: "var(--cat-normal)", priority: 1 },
+    { key: "normal", label: "약속", img: IMG + "face.png", color: "var(--cat-normal)", priority: 1 },
     { key: "important", label: "중요", img: IMG + "important.png", color: "var(--cat-important)", priority: 5 },
     { key: "lesson", label: "수업", img: IMG + "lesson.png", color: "var(--cat-lesson)", priority: 4 },
     { key: "duty", label: "당직", img: IMG + "duty.png", color: "var(--cat-duty)", priority: 3 },

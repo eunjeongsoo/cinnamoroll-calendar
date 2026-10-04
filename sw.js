@@ -1,5 +1,5 @@
 /* sw.js — 오프라인 동작용 서비스워커 (앱 파일을 기기에 저장해 둬요) */
-var CACHE = "cinnamo-calendar-v3";
+var CACHE = "cinnamo-calendar-v4";
 var ASSETS = [
   "./",
   "./index.html",
@@ -28,6 +28,7 @@ var ASSETS = [
   "./icons/app/peek.png",
   "./icons/app/toast.png",
   "./icons/app/fy.png",
+  "./icons/app/gift.png",
   "./icons/app/stickers.png",
   "./icons/app/icon-192.png",
   "./icons/app/icon-512.png",

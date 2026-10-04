@@ -182,12 +182,12 @@
 
             '<div class="field" data-field="start"><label class="lbl">시작</label>' +
               '<div class="dt-row"><input type="date" class="input" id="f-sdate" value="' + sDate + '" aria-label="시작 날짜">' +
-              '<input type="time" class="input time" id="f-stime" value="' + sTime + '" aria-label="시작 시간" step="300"></div>' +
+              timePickHtml("f-stime", sTime, "시작") + "</div>" +
               '<p class="err" data-err="start"></p></div>' +
 
             '<div class="field" data-field="end"><label class="lbl">끝</label>' +
               '<div class="dt-row"><input type="date" class="input" id="f-edate" value="' + eDate + '" aria-label="끝 날짜">' +
-              '<input type="time" class="input time" id="f-etime" value="' + eTime + '" aria-label="끝 시간" step="300"></div>' +
+              timePickHtml("f-etime", eTime, "끝") + "</div>" +
               '<p class="err" data-err="end"></p></div>' +
 
             (editing
@@ -232,9 +232,16 @@
 
       form.addEventListener("submit", function (e) { e.preventDefault(); });
 
+      bindTimePick(q(body, "#f-stime-wrap"));
+      bindTimePick(q(body, "#f-etime-wrap"));
+
+      // 수정할 때: 자동으로 들어갔던 제목이면 계속 자동으로 따라가게
       if (editing && src.category === "lesson" && src.memberId) {
         var m0 = App.state.memberMap[src.memberId];
         if (m0 && titleIn.value === lessonTitle(m0, start)) st.autoTitle = titleIn.value;
+      }
+      if (editing && (src.category === "duty" || src.category === "off") && titleIn.value === U.CAT_MAP[src.category].label) {
+        st.autoTitle = titleIn.value;
       }
 
       function readStart() { return sDate.value ? U.parseKey(sDate.value, allDayIn.checked ? "00:00" : sTime.value || "00:00") : null; }
@@ -242,21 +249,26 @@
 
       function applyAllDay() {
         form.classList.toggle("all-day", allDayIn.checked);
-        sTime.hidden = allDayIn.checked;
-        eTime.hidden = allDayIn.checked;
+        q(body, "#f-stime-wrap").hidden = allDayIn.checked;
+        q(body, "#f-etime-wrap").hidden = allDayIn.checked;
       }
       applyAllDay();
 
+      /** 자동 제목: 수업 = "OOO 회원 (몇시) 수업", 당직/휴무 = 분류명 */
+      function autoTitleFor() {
+        if (st.category === "lesson" && st.memberId) {
+          var m = App.state.memberMap[st.memberId];
+          return m ? lessonTitle(m, readStart() || start) : "";
+        }
+        if (st.category === "duty" || st.category === "off") return U.CAT_MAP[st.category].label;
+        return "";
+      }
       function updateAutoTitle() {
-        if (st.category !== "lesson" || !st.memberId) return;
-        var m = App.state.memberMap[st.memberId];
-        if (!m) return;
-        var s = readStart() || start;
-        var t = lessonTitle(m, s);
-        // 사용자가 직접 고친 제목이면 건드리지 않아요
+        var t = autoTitleFor();
+        // 사용자가 직접 고친 제목이면 건드리지 않아요 (그 제목 그대로 캘린더에 떠요)
         if (!titleIn.value.trim() || titleIn.value === st.autoTitle) {
           titleIn.value = t;
-          UI.setError(body, "title", "");
+          if (t) UI.setError(body, "title", "");
         }
         st.autoTitle = t;
       }
@@ -266,7 +278,7 @@
         if (!s) return;
         var e = new Date(s.getTime() + Math.max(durationMs, 0));
         eDate.value = U.dateKey(e);
-        if (!allDayIn.checked) eTime.value = U.timeStr(e);
+        if (!allDayIn.checked) setTimeVal(eTime, U.timeStr(e));
         UI.setError(body, "end", "");
       }
       function remember() {
@@ -290,13 +302,13 @@
         if (allDayIn.checked) {
           durationMs = Math.max(0, U.startOfDay(readEnd() || start) - U.startOfDay(readStart() || start));
         } else {
-          if (!sTime.value) sTime.value = U.timeStr(defaultStart(sDate.value || U.todayKey()));
+          if (!sTime.value) setTimeVal(sTime, U.timeStr(defaultStart(sDate.value || U.todayKey())));
           var s = readStart();
           var e = readEnd();
           if (s && e && e <= s) {
             var ne = new Date(s.getTime() + 3600000);
             eDate.value = U.dateKey(ne);
-            eTime.value = U.timeStr(ne);
+            setTimeVal(eTime, U.timeStr(ne));
           }
           remember();
         }
@@ -316,7 +328,6 @@
             allDayIn.dispatchEvent(new Event("change"));
           }
         }
-        if (prev === "lesson" && v !== "lesson" && titleIn.value === st.autoTitle) titleIn.value = "";
         renderMember();
         updateAutoTitle();
       });
@@ -585,6 +596,47 @@
         return Store.saveEvents(list);
       });
     }
+  }
+
+  /* ---------- 시간 선택 (10분 단위) ---------- */
+  function hourLabel(h) {
+    return (h < 12 ? "오전 " : "오후 ") + (h % 12 === 0 ? 12 : h % 12) + "시";
+  }
+  function timePickHtml(id, value, label) {
+    var hours = "";
+    for (var h = 0; h < 24; h++) hours += '<option value="' + h + '">' + hourLabel(h) + "</option>";
+    var mins = "";
+    for (var m = 0; m < 60; m += 10) mins += '<option value="' + m + '">' + U.pad(m) + "분</option>";
+    return '<div class="time-pick" id="' + id + '-wrap">' +
+      '<select class="input tp-h" aria-label="' + label + ' 시">' + hours + "</select>" +
+      '<select class="input tp-m" aria-label="' + label + ' 분">' + mins + "</select>" +
+      '<input type="hidden" id="' + id + '" value="' + U.esc(value) + '"></div>';
+  }
+  /** 숨은 값(HH:mm)을 바꾸고 선택 상자도 맞춰요 */
+  function setTimeVal(hidden, v) {
+    hidden.value = v;
+    var wrap = hidden.parentNode;
+    var p = (v || "00:00").split(":").map(Number);
+    var mSel = wrap.querySelector(".tp-m");
+    // 예전에 저장된 10분 단위가 아닌 시간도 그대로 보여줘요
+    if (!mSel.querySelector('option[value="' + p[1] + '"]')) {
+      var o = document.createElement("option");
+      o.value = p[1];
+      o.textContent = U.pad(p[1]) + "분";
+      var after = Array.prototype.find.call(mSel.options, function (x) { return Number(x.value) > p[1]; });
+      mSel.insertBefore(o, after || null);
+    }
+    wrap.querySelector(".tp-h").value = String(p[0]);
+    mSel.value = String(p[1]);
+  }
+  function bindTimePick(wrap) {
+    var hidden = wrap.querySelector('input[type="hidden"]');
+    setTimeVal(hidden, hidden.value);
+    wrap.addEventListener("change", function (e) {
+      if (e.target === hidden) return;
+      hidden.value = U.pad(Number(wrap.querySelector(".tp-h").value)) + ":" + U.pad(Number(wrap.querySelector(".tp-m").value));
+      hidden.dispatchEvent(new Event("change"));
+    });
   }
 
   function clampCount(v) {

@@ -354,7 +354,7 @@
         img: U.IMG + "lying.png",
         options: [
           { label: "수업 일정도 함께 삭제", value: "withEvents", danger: true },
-          { label: "일정은 남기고 일반 일정으로 바꾸기", value: "keepEvents" },
+          { label: "일정은 남기고 약속 일정으로 바꾸기", value: "keepEvents" },
           { label: "취소", value: null }
         ]
       });

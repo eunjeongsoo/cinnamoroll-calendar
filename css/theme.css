@@ -27,14 +27,14 @@
   --cat-important: #FFDDE8;
   --cat-lesson: #D3EBFB;
   --cat-duty: #E3E6FB;
-  --cat-off: #F6E3F1;
+  --cat-off: #FFF5D1;
 
   /* 달력 일정 바 — 파랑/분홍 파스텔 */
   --bar-lesson: #A9D7F5;     /* 수업: 하늘 파랑 */
   --bar-important: #FFB7CC;  /* 중요: 딸기우유 분홍 */
   --bar-duty: #C3CBF5;       /* 당직: 라벤더 블루 */
-  --bar-off: #F3C9E6;        /* 휴무: 솜사탕 핑크 */
-  --bar-normal: #CBEAF4;     /* 일반: 민트 하늘 */
+  --bar-off: #FFEBA8;        /* 휴무: 파스텔 노랑 */
+  --bar-normal: #CBEAF4;     /* 약속: 민트 하늘 */
   --bar-text: #3E4F63;
 
   /* 모양 */
