@@ -25,8 +25,7 @@
     var el = document.createElement("section");
     el.className = "month";
     el.setAttribute("data-ym", ymKey(y, m));
-    var html = '<div class="month-label"><span>' + (m === 0 ? y + "년 " : "") + (m + 1) + '월</span></div>' +
-      '<div class="month-grid" style="grid-template-rows:repeat(' + weeks + ',1fr)">';
+    var html = '<div class="month-grid" style="grid-template-rows:repeat(' + weeks + ',1fr)">';
     for (var i = 0; i < weeks * 7; i++) {
       var d = i - lead + 1;
       if (d < 1 || d > days) {

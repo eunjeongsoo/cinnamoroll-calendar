@@ -18,6 +18,7 @@
   --text-soft: #8797A8;
   --line: #CDE6F7;          /* 몽글몽글 블루 선 */
   --line-strong: #A6D3F1;
+  --line-soft: #E5F1FA;     /* 달력 칸 선 (연하게) */
   --shadow-color: 125, 185, 232;
   --dim: rgba(74, 91, 110, 0.32);
 

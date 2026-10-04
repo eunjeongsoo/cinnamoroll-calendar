@@ -1,4 +1,4 @@
-/* settings.js — 설정 메뉴: 백업 내보내기/불러오기, 알림 권한 */
+/* settings.js — 설정 메뉴: 백업 내보내기/불러오기 */
 (function () {
   "use strict";
 
@@ -9,13 +9,17 @@
     return U.fmtShortDate(d) + " " + U.timeStr(d);
   }
 
-  function notifState() {
-    if (!("Notification" in window)) return { key: "unsupported", label: "이 브라우저는 알림을 지원하지 않아요" };
-    var p = Notification.permission;
-    if (p === "granted") return { key: "granted", label: "알림 허용됨 🔔" };
-    if (p === "denied") return { key: "denied", label: "알림이 차단돼 있어요" };
-    return { key: "default", label: "아직 알림 권한을 물어보지 않았어요" };
-  }
+  // 왕관 쓴 시나모롤
+  var CROWN =
+    '<svg class="crown" viewBox="0 0 44 30" aria-hidden="true">' +
+      '<path d="M5 25L3 8l10 8 9-13 9 13 10-8-2 17z" fill="#FFE08A" stroke="#8E6A4C" stroke-width="1.8" stroke-linejoin="round"/>' +
+      '<path d="M5 25h34" stroke="#8E6A4C" stroke-width="1.8"/>' +
+      '<rect x="5" y="21.5" width="34" height="4.5" rx="2" fill="#FFD1E0" stroke="#8E6A4C" stroke-width="1.6"/>' +
+      '<circle cx="22" cy="14" r="2.6" fill="#7DB9E8" stroke="#8E6A4C" stroke-width="1.2"/>' +
+      '<circle cx="3" cy="7" r="2" fill="#FFB7CC" stroke="#8E6A4C" stroke-width="1.2"/>' +
+      '<circle cx="22" cy="3" r="2" fill="#FFB7CC" stroke="#8E6A4C" stroke-width="1.2"/>' +
+      '<circle cx="41" cy="7" r="2" fill="#FFB7CC" stroke="#8E6A4C" stroke-width="1.2"/>' +
+    "</svg>";
 
   function open() {
     UI.openSheet({
@@ -30,7 +34,6 @@
           var act = b.getAttribute("data-act");
           if (act === "export") exportBackup(sheet);
           else if (act === "import") body.querySelector("#import-file").click();
-          else if (act === "notif") requestNotif(sheet);
         });
         body.addEventListener("change", function (e) {
           if (e.target.id === "import-file") {
@@ -46,9 +49,8 @@
 
   function draw(sheet) {
     Store.getMeta("lastBackupAt").then(function (last) {
-      var n = notifState();
       sheet.body.innerHTML =
-        '<div class="settings-hero"><img src="' + U.IMG + 'stickers.png" alt=""><div>' +
+        '<div class="settings-hero"><span class="king"><img src="' + U.IMG + 'face.png" alt="">' + CROWN + "</span><div>" +
           "<strong>시나모롤 캘린더</strong><span>주현언니꼬! ☁️</span></div></div>" +
 
         '<section class="set-card">' +
@@ -58,16 +60,6 @@
           '<button type="button" class="btn primary block" data-act="export">' + UI.ICON.download + "<span>백업 파일 내보내기</span></button>" +
           '<button type="button" class="btn soft block" data-act="import">' + UI.ICON.upload + "<span>백업 파일 불러오기</span></button>" +
           '<input type="file" id="import-file" accept=".json,application/json" hidden>' +
-        "</section>" +
-
-        '<section class="set-card">' +
-          '<h4>' + UI.ICON.bell + "<span>알림</span></h4>" +
-          '<p class="notif-state ' + n.key + '">' + n.label + "</p>" +
-          (n.key === "denied" ? '<p class="muted">브라우저(또는 폰) 설정 → 사이트/앱 설정에서 알림을 허용으로 바꿔주세요.</p>' : "") +
-          (n.key !== "unsupported" && n.key !== "granted"
-            ? '<button type="button" class="btn soft block" data-act="notif">' + UI.ICON.bell + "<span>알림 권한 " + (n.key === "denied" ? "다시 " : "") + "요청하기</span></button>"
-            : "") +
-          '<p class="muted tiny">새해가 되면 회원 나이가 한 살씩 올랐다고 알려드려요.</p>' +
         "</section>" +
 
         '<section class="set-card">' +
@@ -152,20 +144,6 @@
       }).catch(App.fail);
     };
     reader.readAsText(file);
-  }
-
-  function requestNotif(sheet) {
-    if (!("Notification" in window)) return;
-    try {
-      var r = Notification.requestPermission(function () { draw(sheet); });
-      if (r && r.then) r.then(function (p) {
-        draw(sheet);
-        if (p === "granted") UI.toast("알림이 켜졌어요! 🔔");
-        else if (p === "denied") UI.toast("알림이 차단돼 있어요. 설정에서 바꿔주세요");
-      });
-    } catch (e) {
-      draw(sheet);
-    }
   }
 
   window.Settings = { open: open };

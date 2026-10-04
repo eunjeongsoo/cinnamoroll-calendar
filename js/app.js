@@ -123,18 +123,6 @@
         body.querySelector('[data-act="ok"]').addEventListener("click", function () { UI.back(); });
       }
     });
-    try {
-      if ("Notification" in window && Notification.permission === "granted" && navigator.serviceWorker && navigator.serviceWorker.ready) {
-        navigator.serviceWorker.ready.then(function (reg) {
-          reg.showNotification("시나모롤 캘린더", {
-            body: "새해가 됐어요! 회원들 나이가 한 살씩 올랐어요",
-            icon: "icons/app/icon-192.png",
-            badge: "icons/app/icon-192.png",
-            tag: "new-year-" + U.currentYear()
-          });
-        }).catch(function () {});
-      }
-    } catch (e) { /* 알림 실패는 무시 */ }
   }
 
   function registerSW() {
